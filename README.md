@@ -1,0 +1,2 @@
+# FastAPIStarter
+A FastAPI template
