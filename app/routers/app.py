@@ -14,7 +14,7 @@ app_router = APIRouter()
 @app_router.get("/app", response_class=HTMLResponse)
 async def app(
     request: Request,
-    user_logged_in: IsUserLoggedIn,
+    user: AuthDep,
     db:SessionDep
 ):
     return templates.TemplateResponse(
