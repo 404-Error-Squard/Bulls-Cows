@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.game_session import GameSession
 from app.models.guess import Guess
-
 
 class GameService:
     def __init__(self, user_repo, puzzle_repo, session_repo, guess_repo):
@@ -28,11 +27,13 @@ class GameService:
         if not user:
             raise ValueError("User not found.")
 
-        puzzle = self.puzzle_repo.get_by_date(datetime.utcnow().date())
+        puzzle = self.puzzle_repo.get_by_date(datetime.now(timezone.utc).date())
         if not puzzle:
             raise ValueError("No puzzle exists for today.")
 
-        existing_session = self.session_repo.get_user_session_for_puzzle(user.id, puzzle.id)
+        existing_session = self.session_repo.get_user_session_for_puzzle(
+            user.id, puzzle.id
+        )
         if existing_session:
             return existing_session
 
@@ -49,16 +50,16 @@ class GameService:
         if not user:
             raise ValueError("User not found.")
 
-        puzzle = self.puzzle_repo.get_by_date(datetime.utcnow().date())
+        puzzle = self.puzzle_repo.get_by_date(datetime.now(timezone.utc).date())
         if not puzzle:
-            raise ValueError("No puzzle exists for today.")
+            raise ValueError("No puzzle available today.")
 
         session = self.session_repo.get_user_session_for_puzzle(user.id, puzzle.id)
         if not session:
-            raise ValueError("No active session for this user.")
+            raise ValueError("No active session. Start a game first.")
 
         if session.status != "active":
-            raise ValueError("This session is already completed.")
+            raise ValueError("Game already finished.")
 
         bulls, cows = self.score_guess(puzzle.secret_number, guess_value)
 
@@ -66,7 +67,7 @@ class GameService:
             session_id=session.id,
             guess_value=guess_value,
             bulls=bulls,
-            cows=cows
+            cows=cows,
         )
         self.guess_repo.create(guess)
 
@@ -74,20 +75,15 @@ class GameService:
 
         if bulls == 4:
             session.status = "won"
-            session.completed_at = datetime.utcnow()
+            session.completed_at = datetime.now(timezone.utc)
+
         elif session.attempts_used >= session.max_attempts:
             session.status = "lost"
-            session.completed_at = datetime.utcnow()
+            session.completed_at = datetime.now(timezone.utc)
 
         self.session_repo.update(session)
 
-        return {
-            "guess": guess_value,
-            "bulls": bulls,
-            "cows": cows,
-            "status": session.status,
-            "attempts_used": session.attempts_used
-        }
+        return guess, session
 
     def get_user_history(self, username: str):
         user = self.user_repo.get_by_username(username)
