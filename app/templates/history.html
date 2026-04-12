@@ -1,0 +1,119 @@
+{% extends "authenticated-base.html" %}
+
+{% block title %}Game History{% endblock %}
+
+{% block additional_styles %}
+<style>
+    body {
+        background-color: #0b0f0c !important;
+    }
+
+    #sidebar {
+        background: #0b0f0c !important;
+        border-right: 1px solid #1f7a4d;
+    }
+
+    #sidebar .nav-link:hover,
+    #sidebar .nav-link.active {
+        background-color: #12311f !important;
+        color: #39ff88 !important;
+    }
+
+    #content {
+        background: #0b0f0c !important;
+        color: #e8fff1;
+    }
+
+    .navbar {
+        background: #121a14 !important;
+        border: 1px solid #1f7a4d !important;
+    }
+
+    .history-card {
+        background: linear-gradient(180deg, #121a14, #0f1511);
+        border: 1px solid rgba(57, 255, 136, 0.18);
+        border-radius: 1rem;
+        box-shadow: 0 0 18px rgba(57, 255, 136, 0.07);
+        color: #e8fff1;
+    }
+
+    .history-title {
+        color: #39ff88;
+    }
+
+    .muted-text {
+        color: #9ccfb0;
+    }
+
+    .table-dark-green {
+        --bs-table-bg: transparent;
+        --bs-table-color: #e8fff1;
+        --bs-table-border-color: rgba(57, 255, 136, 0.12);
+    }
+
+    .table-dark-green thead th {
+        color: #39ff88;
+    }
+</style>
+{% endblock %}
+
+{% block subpage_content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="history-card p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="history-title mb-2">Game History</h2>
+                    <p class="muted-text mb-0">Previous sessions for {{ user.username }}</p>
+                </div>
+                <a href="/game" class="btn btn-outline-success">Back to Game</a>
+            </div>
+        </div>
+    </div>
+
+    {% if history %}
+        <div class="row g-4">
+            {% for session in history|reverse %}
+                <div class="col-12">
+                    <div class="history-card p-4">
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Session ID:</strong> {{ session.session_id }}</div>
+                            <div class="col-md-4"><strong>Status:</strong> {{ session.status|upper }}</div>
+                            <div class="col-md-4"><strong>Attempts:</strong> {{ session.attempts_used }} / 7</div>
+                        </div>
+
+                        {% if session.guesses %}
+                            <div class="table-responsive">
+                                <table class="table table-dark-green">
+                                    <thead>
+                                        <tr>
+                                            <th>Guess</th>
+                                            <th>Bulls</th>
+                                            <th>Cows</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for guess in session.guesses %}
+                                            <tr>
+                                                <td>{{ guess.guess_value }}</td>
+                                                <td>{{ guess.bulls }}</td>
+                                                <td>{{ guess.cows }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="muted-text mb-0">No guesses recorded for this session.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="history-card p-4">
+            <p class="muted-text mb-0">No game history yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
