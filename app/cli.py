@@ -80,7 +80,7 @@ def guess(username: str, guess_value: str):
         )
 
         try:
-            guess_obj, session = game_service.submit_guess(username, guess_value)
+            guess_obj, session, answer = game_service.submit_guess(username, guess_value)
 
             typer.echo(f"\n Guess: {guess_value}")
             typer.echo(f" Bulls: {guess_obj.bulls} |  Cows: {guess_obj.cows}")
@@ -92,7 +92,7 @@ def guess(username: str, guess_value: str):
                 typer.echo("You won the game!!!")
 
             elif session.status == "lost":
-                typer.echo("You lost! Try again tomorrow.")
+                typer.echo(f"You lost! The answer was {answer}.")
 
         except ValueError as e:
             typer.echo(f" Error: {e}")
