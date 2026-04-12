@@ -12,29 +12,31 @@ from app.services.game_service import GameService
 cli = typer.Typer()
 
 
-@cli.command("initialize")
-def init_db():
+@cli.command("initialize") #Note use del database.db and reinitialize to avoid daily puzzle.
+def initialize(): #Game resets at utc time midnight.
     SQLModel.metadata.create_all(engine)
-    typer.echo("DB initialized.")
 
-
-@cli.command("seed-bob")
-def seed_bob():
     with get_cli_session() as db:
         user_repo = UserRepository(db)
         auth_service = AuthService(user_repo)
+        puzzle_repo = DailyPuzzleRepository(db)
+        puzzle_service = PuzzleService(puzzle_repo)
 
         existing = user_repo.get_by_username("bob")
-        if existing:
+        if not existing:
+            auth_service.register_user(
+                username="bob",
+                email="bob@example.com",
+                password="bobpass"
+            )
+            typer.echo("Created bob / bobpass")
+        else:
             typer.echo("bob already exists")
-            return
 
-        auth_service.register_user(
-            username="bob",
-            email="bob@example.com",
-            password="bobpass"
-        )
-        typer.echo("Created bob / bobpass")
+        puzzle = puzzle_service.get_or_create_today_puzzle()
+        typer.echo(f"Puzzle ready for {puzzle.puzzle_date}: {puzzle.secret_number}")
+
+    typer.echo("Database initialized.")
 
 
 @cli.command("create-puzzle")
