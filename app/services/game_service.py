@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from app.models.game_session import GameSession
 from app.models.guess import Guess
+from app.services.puzzle_service import PuzzleService
 
 class GameService:
     def __init__(self, user_repo, puzzle_repo, session_repo, guess_repo):
@@ -8,6 +9,7 @@ class GameService:
         self.puzzle_repo = puzzle_repo
         self.session_repo = session_repo
         self.guess_repo = guess_repo
+        self.puzzle_service = PuzzleService(puzzle_repo)
 
     def validate_guess(self, guess_value: str):
         if len(guess_value) != 4:
@@ -27,9 +29,7 @@ class GameService:
         if not user:
             raise ValueError("User not found.")
 
-        puzzle = self.puzzle_repo.get_by_date(datetime.now(timezone.utc).date())
-        if not puzzle:
-            raise ValueError("No puzzle exists for today.")
+        puzzle = self.puzzle_service.get_or_create_today_puzzle()
 
         existing_session = self.session_repo.get_user_session_for_puzzle(
             user.id, puzzle.id
@@ -50,9 +50,7 @@ class GameService:
         if not user:
             raise ValueError("User not found.")
 
-        puzzle = self.puzzle_repo.get_by_date(datetime.now(timezone.utc).date())
-        if not puzzle:
-            raise ValueError("No puzzle available today.")
+        puzzle = self.puzzle_service.get_or_create_today_puzzle()
 
         session = self.session_repo.get_user_session_for_puzzle(user.id, puzzle.id)
         if not session:
@@ -76,7 +74,6 @@ class GameService:
         if bulls == 4:
             session.status = "won"
             session.completed_at = datetime.now(timezone.utc)
-
         elif session.attempts_used >= session.max_attempts:
             session.status = "lost"
             session.completed_at = datetime.now(timezone.utc)

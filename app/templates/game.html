@@ -98,6 +98,7 @@
             <div class="game-card p-4">
                 <h2 class="game-title mb-2">Bulls and Cows</h2>
                 <p class="muted-text mb-0">Crack today’s 4-digit code using unique digits.</p>
+                <p id="reset-timer" class="muted-text mt-2"></p>
             </div>
         </div>
     </div>
@@ -208,4 +209,29 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateResetTimer() {
+    const now = new Date();
+
+    const nextUtcMidnight = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() + 1,
+        0, 0, 0
+    ));
+
+    const diff = nextUtcMidnight - now;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("reset-timer").innerText =
+        `Resets in: ${hours}h ${minutes}m ${seconds}s (UTC)`;
+}
+
+setInterval(updateResetTimer, 1000);
+updateResetTimer();
+</script>
+
 {% endblock %}
