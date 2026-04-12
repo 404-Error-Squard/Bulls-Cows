@@ -80,7 +80,7 @@ async def submit_guess_action(
     game_service = build_game_service(db)
 
     try:
-        guess_obj, session = game_service.submit_guess(user.username, guess_value)
+        guess_obj, session, answer = game_service.submit_guess(user.username, guess_value)
 
         if session.status == "won":
             flash(
@@ -91,7 +91,7 @@ async def submit_guess_action(
         elif session.status == "lost":
             flash(
                 request,
-                f"Guess {guess_obj.guess_value}: {guess_obj.bulls} Bulls, {guess_obj.cows} Cows. You lost.",
+                f"Guess {guess_obj.guess_value}: {guess_obj.bulls} Bulls, {guess_obj.cows} Cows. You lost. The answer was {answer}.",
                 "danger",
             )
         else:

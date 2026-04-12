@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from app.models.game_session import GameSession
 from app.models.guess import Guess
+from app.repositories import puzzle
 from app.services.puzzle_service import PuzzleService
 
 class GameService:
@@ -79,8 +80,8 @@ class GameService:
             session.completed_at = datetime.now(timezone.utc)
 
         self.session_repo.update(session)
-
-        return guess, session
+        answer = puzzle.secret_number if session.status == "lost" else None
+        return guess, session, answer
 
     def get_user_history(self, username: str):
         user = self.user_repo.get_by_username(username)
