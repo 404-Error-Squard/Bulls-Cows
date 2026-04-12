@@ -1,0 +1,95 @@
+{% extends "authenticated-base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block external_js %}
+<script src="{{ url_for('static', path='js/app.js')}}"></script>
+{% endblock %}
+
+{% block additional_styles %}
+<style>
+    body {
+        background-color: #0b0f0c !important;
+    }
+
+    #sidebar {
+        background: #0b0f0c !important;
+        border-right: 1px solid #1f7a4d;
+    }
+
+    #sidebar .nav-link:hover,
+    #sidebar .nav-link.active {
+        background-color: #12311f !important;
+        color: #39ff88 !important;
+    }
+
+    #content {
+        background: #0b0f0c !important;
+        color: #e8fff1;
+    }
+
+    .navbar {
+        background: #121a14 !important;
+        border: 1px solid #1f7a4d !important;
+    }
+
+    .users-card {
+        background: linear-gradient(180deg, #121a14, #0f1511);
+        border: 1px solid rgba(57, 255, 136, 0.18);
+        border-radius: 1rem;
+        box-shadow: 0 0 18px rgba(57, 255, 136, 0.07);
+        color: #e8fff1;
+    }
+
+    .users-title {
+        color: #39ff88;
+        text-shadow: 0 0 10px rgba(57, 255, 136, 0.25);
+    }
+
+    .muted-text {
+        color: #9ccfb0;
+    }
+
+    .table-green {
+        --bs-table-bg: transparent;
+        --bs-table-color: #e8fff1;
+        --bs-table-border-color: rgba(57, 255, 136, 0.12);
+    }
+
+    .table-green thead th {
+        color: #39ff88;
+    }
+
+    a {
+        color: #39ff88;
+    }
+</style>
+{% endblock %}
+
+{% block subpage_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="users-card p-4">
+                <h2 class="users-title mb-3">Users</h2>
+                <p class="muted-text">
+                    This table is rendered on the client. JavaScript requests the data from
+                    <a href="/api/users">/api/users</a> and writes it to this page.
+                </p>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-green">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Username</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

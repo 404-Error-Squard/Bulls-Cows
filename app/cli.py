@@ -12,7 +12,7 @@ from app.services.game_service import GameService
 cli = typer.Typer()
 
 
-@cli.command("init-db")
+@cli.command("initialize")
 def init_db():
     SQLModel.metadata.create_all(engine)
     typer.echo("DB initialized.")

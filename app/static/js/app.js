@@ -5,8 +5,11 @@ async function getUserData(){
 }
 
 function loadTable(users){
-    const table = document.querySelector('#result');
-    for(let user of users){
+    const table = document.querySelector('#users-table-body') || document.querySelector('#result');
+    if (!table) return;
+
+    table.innerHTML = '';
+    for (let user of users){
         table.innerHTML += `<tr>
             <td>${user.id}</td>
             <td>${user.username}</td>
